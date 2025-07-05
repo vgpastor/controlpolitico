@@ -18,7 +18,7 @@ interface FiltrosSesionesProps {
 export function FiltrosSesionesComponent({ filtros, onFiltrosChange }: FiltrosSesionesProps) {
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
 
-  const handleCambioFiltro = (campo: keyof FiltrosSesiones, valor: any) => {
+  const handleCambioFiltro = (campo: keyof FiltrosSesiones, valor: string | Date | null | undefined) => {
     onFiltrosChange({
       ...filtros,
       [campo]: valor || undefined

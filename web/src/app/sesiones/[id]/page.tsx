@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import { ServiceFactory } from '@/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { PoliticoCard } from '@/components/PoliticoCard';
 import { 
   obtenerNombreCamara, 
   obtenerColorCamara, 
@@ -17,21 +16,22 @@ import {
 import { Calendar, Clock, MapPin, Users, FileText } from 'lucide-react';
 
 interface SesionDetailPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function SesionDetailPage({ params }: SesionDetailPageProps) {
+  const { id } = await params;
   const sesionService = ServiceFactory.getSesionService();
   const asistenciaService = ServiceFactory.getAsistenciaService();
   const politicoService = ServiceFactory.getPoliticoService();
 
-  const sesion = await sesionService.obtenerPorId(params.id);
+  const sesion = await sesionService.obtenerPorId(id);
   
   if (!sesion) {
     notFound();
   }
 
-  const asistencias = await asistenciaService.obtenerPorSesion(params.id);
+  const asistencias = await asistenciaService.obtenerPorSesion(id);
   
   // Obtener detalles de los políticos
   const politicosConAsistencia = await Promise.all(
@@ -157,10 +157,12 @@ export default async function SesionDetailPage({ params }: SesionDetailPageProps
                         <p className="font-medium text-sm">
                           {politico.nombre} {politico.apellidos}
                         </p>
-                        <p className="text-xs text-gray-600">{politico.partido}</p>
+                        <p className="text-xs text-gray-600">
+                          {politico.carreraPolitica.find(c => c.activo)?.partido || 'Sin partido'}
+                        </p>
                       </div>
                     </div>
-                    <Badge variant="success">Asistió</Badge>
+                    <Badge variant="default">Asistió</Badge>
                   </div>
                 )
               ))}
@@ -192,7 +194,9 @@ export default async function SesionDetailPage({ params }: SesionDetailPageProps
                         <p className="font-medium text-sm">
                           {politico.nombre} {politico.apellidos}
                         </p>
-                        <p className="text-xs text-gray-600">{politico.partido}</p>
+                        <p className="text-xs text-gray-600">
+                          {politico.carreraPolitica.find(c => c.activo)?.partido || 'Sin partido'}
+                        </p>
                         {asistencia.justificacion && (
                           <p className="text-xs text-gray-500 italic">
                             {asistencia.justificacion}

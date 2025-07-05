@@ -17,7 +17,7 @@ interface FiltrosPoliticosProps {
 export function FiltrosPoliticosComponent({ filtros, onFiltrosChange }: FiltrosPoliticosProps) {
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
 
-  const handleCambioFiltro = (campo: keyof FiltrosPoliticos, valor: any) => {
+  const handleCambioFiltro = (campo: keyof FiltrosPoliticos, valor: string | boolean | undefined) => {
     onFiltrosChange({
       ...filtros,
       [campo]: valor || undefined

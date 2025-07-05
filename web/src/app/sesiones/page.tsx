@@ -6,8 +6,6 @@ import { Sesion, FiltrosSesiones } from '@/types';
 import { ServiceFactory } from '@/services';
 import { SesionCard } from '@/components/SesionCard';
 import { FiltrosSesionesComponent } from '@/components/FiltrosSesiones';
-import { Input } from '@/components/ui/Input';
-import { Search } from 'lucide-react';
 
 export default function SesionesPage() {
   const [sesiones, setSesiones] = useState<Sesion[]>([]);
@@ -15,7 +13,6 @@ export default function SesionesPage() {
   const [cargando, setCargando] = useState(true);
 
   const sesionService = ServiceFactory.getSesionService();
-  const asistenciaService = ServiceFactory.getAsistenciaService();
 
   useEffect(() => {
     const cargarSesiones = async () => {
@@ -81,22 +78,5 @@ export default function SesionesPage() {
 
 // Componente auxiliar para cargar estadísticas
 function SesionCardWithStats({ sesion }: { sesion: Sesion }) {
-  const [numeroAsistentes, setNumeroAsistentes] = useState<number | undefined>();
-
-  useEffect(() => {
-    const cargarAsistentes = async () => {
-      try {
-        const asistenciaService = ServiceFactory.getAsistenciaService();
-        const asistencias = await asistenciaService.obtenerPorSesion(sesion.id);
-        const asistentes = asistencias.filter(a => a.asistio).length;
-        setNumeroAsistentes(asistentes);
-      } catch {
-        setNumeroAsistentes(undefined);
-      }
-    };
-
-    cargarAsistentes();
-  }, [sesion.id]);
-
-  return <SesionCard sesion={sesion} numeroAsistentes={numeroAsistentes} />;
+  return <SesionCard sesion={sesion} />;
 }

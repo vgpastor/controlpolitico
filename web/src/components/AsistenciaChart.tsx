@@ -11,7 +11,6 @@ interface AsistenciaChartProps {
 
 export function AsistenciaChart({ estadisticas }: AsistenciaChartProps) {
   const { porcentajeAsistencia, sesionesAsistidas, totalSesiones } = estadisticas;
-  const porcentajeAusencia = 100 - porcentajeAsistencia;
 
   return (
     <Card>

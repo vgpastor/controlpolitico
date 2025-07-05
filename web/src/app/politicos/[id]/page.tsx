@@ -10,26 +10,30 @@ import {
   formatearFecha, 
   formatearFechaCorta 
 } from '@/lib/utils';
-import { User, Calendar, Building, Mail, Phone, MapPin } from 'lucide-react';
+import { User, Calendar, Building } from 'lucide-react';
 
 interface PoliticoDetailPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function PoliticoDetailPage({ params }: PoliticoDetailPageProps) {
+  const { id } = await params;
   const politicoService = ServiceFactory.getPoliticoService();
   const asistenciaService = ServiceFactory.getAsistenciaService();
   const sesionService = ServiceFactory.getSesionService();
 
-  const politico = await politicoService.obtenerPorId(params.id);
+  const politico = await politicoService.obtenerPorId(id);
   
   if (!politico) {
     notFound();
   }
 
+  // Get current active career
+  const carreraActiva = politico.carreraPolitica.find(c => c.activo);
+
   const [estadisticas, asistencias] = await Promise.all([
-    asistenciaService.obtenerEstadisticas(params.id),
-    asistenciaService.obtenerPorPolitico(params.id)
+    asistenciaService.obtenerEstadisticas(id),
+    asistenciaService.obtenerPorPolitico(id)
   ]);
 
   // Obtener detalles de las sesiones
@@ -53,14 +57,20 @@ export default async function PoliticoDetailPage({ params }: PoliticoDetailPageP
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 {politico.nombre} {politico.apellidos}
               </h1>
-              <p className="text-xl text-gray-600 mb-4">{politico.cargo}</p>
+              {carreraActiva && (
+                <p className="text-xl text-gray-600 mb-4">{carreraActiva.cargo}</p>
+              )}
               <div className="flex flex-wrap gap-2">
-                <Badge className={obtenerColorCamara(politico.camara)}>
-                  {obtenerNombreCamara(politico.camara)}
-                </Badge>
-                <Badge variant="secondary">{politico.partido}</Badge>
+                {carreraActiva && (
+                  <>
+                    <Badge className={obtenerColorCamara(carreraActiva.camara)}>
+                      {obtenerNombreCamara(carreraActiva.camara)}
+                    </Badge>
+                    <Badge variant="secondary">{carreraActiva.partido}</Badge>
+                  </>
+                )}
                 {politico.activo && (
-                  <Badge variant="success">Activo</Badge>
+                  <Badge variant="default">Activo</Badge>
                 )}
               </div>
             </div>
@@ -70,16 +80,20 @@ export default async function PoliticoDetailPage({ params }: PoliticoDetailPageP
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-3">
               <h3 className="font-semibold text-lg">Información Personal</h3>
-              <div className="flex items-center space-x-2">
-                <Calendar className="w-4 h-4 text-gray-500" />
-                <span className="text-sm">
-                  En el cargo desde {formatearFecha(politico.fechaIngreso)}
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Building className="w-4 h-4 text-gray-500" />
-                <span className="text-sm">{obtenerNombreCamara(politico.camara)}</span>
-              </div>
+              {carreraActiva && (
+                <>
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="w-4 h-4 text-gray-500" />
+                    <span className="text-sm">
+                      En el cargo desde {formatearFecha(carreraActiva.fechaInicio)}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Building className="w-4 h-4 text-gray-500" />
+                    <span className="text-sm">{obtenerNombreCamara(carreraActiva.camara)}</span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </CardContent>
@@ -114,7 +128,7 @@ export default async function PoliticoDetailPage({ params }: PoliticoDetailPageP
                     </div>
                     <div className="flex items-center space-x-2">
                       <Badge 
-                        variant={asistencia.asistio ? "success" : "destructive"}
+                        variant={asistencia.asistio ? "default" : "destructive"}
                       >
                         {asistencia.asistio ? 'Asistió' : 'No asistió'}
                       </Badge>

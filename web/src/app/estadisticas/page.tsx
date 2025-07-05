@@ -2,13 +2,12 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Politico, Sesion, EstadisticasAsistencia, Camara } from '@/types';
+import { Politico, Camara } from '@/types';
 import { ServiceFactory } from '@/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { PoliticoCard } from '@/components/PoliticoCard';
 import { obtenerNombreCamara, obtenerColorPorcentaje } from '@/lib/utils';
-import { TrendingUp, TrendingDown, Users, Calendar, Award, AlertTriangle } from 'lucide-react';
+import { TrendingUp, Users, Calendar, Award, AlertTriangle } from 'lucide-react';
 
 export default function EstadisticasPage() {
   const [estadisticas, setEstadisticas] = useState<{
@@ -53,7 +52,9 @@ export default function EstadisticasPage() {
         const camaras = Object.values(Camara);
         const estadisticasPorCamara = await Promise.all(
           camaras.map(async (camara) => {
-            const politicosCamara = politicos.filter(p => p.camara === camara);
+            const politicosCamara = politicos.filter(p => 
+              p.carreraPolitica.some(c => c.activo && c.camara === camara)
+            );
             if (politicosCamara.length === 0) {
               return { camara, total: 0, promedio: 0 };
             }
@@ -215,10 +216,12 @@ export default function EstadisticasPage() {
                       <p className="font-medium text-sm">
                         {politico.nombre} {politico.apellidos}
                       </p>
-                      <p className="text-xs text-gray-600">{politico.partido}</p>
+                      <p className="text-xs text-gray-600">
+                        {politico.carreraPolitica.find(c => c.activo)?.partido || 'Sin partido'}
+                      </p>
                     </div>
                   </div>
-                  <Badge variant="success">{porcentaje}%</Badge>
+                  <Badge variant="default">{porcentaje}%</Badge>
                 </div>
               ))}
             </div>
@@ -244,7 +247,9 @@ export default function EstadisticasPage() {
                       <p className="font-medium text-sm">
                         {politico.nombre} {politico.apellidos}
                       </p>
-                      <p className="text-xs text-gray-600">{politico.partido}</p>
+                      <p className="text-xs text-gray-600">
+                        {politico.carreraPolitica.find(c => c.activo)?.partido || 'Sin partido'}
+                      </p>
                     </div>
                   </div>
                   <Badge variant="destructive">{porcentaje}%</Badge>
