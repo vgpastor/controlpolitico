@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Users, Calendar, BarChart3, Home, Menu, X } from 'lucide-react';
 import { useState } from 'react';
@@ -30,7 +31,14 @@ export function Navigation() {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl blur opacity-75 group-hover:opacity-100 transition-opacity"></div>
                 <div className="relative bg-white p-2 rounded-xl shadow-lg">
-                  <BarChart3 className="h-6 w-6 lg:h-8 lg:w-8 text-purple-600" />
+                  <Image
+                    src="/logo.png"
+                    alt="Control Político Logo"
+                    width={40}
+                    height={40}
+                    className="h-8 w-8 lg:h-10 lg:w-10 object-contain"
+                    priority
+                  />
                 </div>
               </div>
               <div className="hidden sm:block">
@@ -41,9 +49,16 @@ export function Navigation() {
                   Transparencia democrática
                 </div>
               </div>
-              <span className="text-lg font-bold text-gradient block sm:hidden">
-                CP
-              </span>
+              <div className="block sm:hidden">
+                <Image
+                  src="/logo.png"
+                  alt="Control Político"
+                  width={32}
+                  height={32}
+                  className="h-8 w-8 object-contain"
+                  priority
+                />
+              </div>
             </Link>
             
             {/* Desktop Navigation */}
